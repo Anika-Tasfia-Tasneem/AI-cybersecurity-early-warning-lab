@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Cybersecurity Early‑Warning Lab</title>
+<style>
+:root{--bg:#f1f5fb;--card:#fff;--tx:#0f1b2d;--mu:#5b6b82;--bd:#d6dfec;--ok:#0a9fb5;--ml:#7c4dff;--ru:#e8890c;--bad:#e5384f;--grid:#0f1b2d12;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b14;--card:#0e1626;--tx:#e6edf8;--mu:#8ea0bb;--bd:#1f2c44;--ok:#27e1ff;--ml:#a98bff;--ru:#ffb020;--bad:#ff4d6a;--grid:#ffffff10}}
+:root[data-theme="dark"]{--bg:#070b14;--card:#0e1626;--tx:#e6edf8;--mu:#8ea0bb;--bd:#1f2c44;--ok:#27e1ff;--ml:#a98bff;--ru:#ffb020;--bad:#ff4d6a;--grid:#ffffff10}
+*{box-sizing:border-box}
+html,body{height:auto}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:36px 36px;animation:gm 8s linear infinite}
+@keyframes gm{to{background-position:36px 36px}}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:18px 20px;max-width:1500px;margin:auto}
+h1{margin:0;font-size:clamp(18px,3vw,27px);background:linear-gradient(90deg,var(--ok),var(--ml),var(--bad),var(--ok));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 6s linear infinite}
+@keyframes sh{to{background-position:300% 0}}
+header p{margin:2px 0 0;color:var(--mu)}
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:0 20px 20px;max-width:1500px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;animation:up .6s both;transition:box-shadow .3s,border-color .3s;min-width:0}
+.card:hover{border-color:var(--ok);box-shadow:0 0 26px -8px var(--ok)}
+@keyframes up{from{opacity:0;transform:translateY(18px)}}
+h2{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+h2 small{text-transform:none;letter-spacing:0;opacity:.85}
+canvas{width:100%;display:block}
+#net{height:360px}#tl{height:190px}#roc{height:220px}
+.span2{grid-column:span 2}
+@media(max-width:640px){.span2{grid-column:auto}main{padding:0 12px 16px}}
+button{background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:6px 11px;cursor:pointer;font:inherit;transition:transform .15s,border-color .2s,box-shadow .2s}
+button:hover{transform:translateY(-2px);border-color:var(--ok);box-shadow:0 4px 14px -6px var(--ok)}
+button:active{transform:scale(.95)}
+.hot{border-color:var(--ml);color:var(--ml);font-weight:600}
+.pill{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid var(--ok);color:var(--ok);animation:pl 1.6s infinite}
+@keyframes pl{50%{box-shadow:0 0 14px var(--ok)}}
+#feed{height:360px;overflow:auto}
+#feed:empty::before{content:"Monitoring… alerts will appear here";color:var(--mu)}
+.al{display:flex;gap:6px;align-items:center;padding:6px 8px;border:1px solid var(--bd);border-left:4px solid;border-radius:8px;margin-bottom:6px;cursor:pointer;animation:si .4s;font-size:12px}
+.al:hover{background:var(--grid)}
+@keyframes si{from{opacity:0;transform:translateX(30px)}}
+.chip{font-size:10px;padding:1px 7px;border-radius:99px;color:#fff;white-space:nowrap}
+.br{position:relative;height:15px;background:var(--grid);border-radius:8px;margin:3px 0;overflow:hidden}
+.br i{display:block;height:100%;width:0;border-radius:8px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.br em{position:absolute;right:7px;top:0;font-size:10px;font-style:normal;line-height:15px;text-shadow:0 0 3px var(--card)}
+.mr small,.ex span{color:var(--mu);font-size:12px}
+.lg{font-size:12px;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+label{display:block;margin:6px 0;font-size:13px}
+input[type=range]{width:100%;accent-color:var(--ml)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+#vd{margin:8px 0 0;padding:8px;border-radius:8px;background:var(--grid);font-size:13px}
+#cm{font-size:12px;color:var(--mu);margin-top:6px}
+footer{max-width:1500px;margin:auto;padding:0 20px 20px;color:var(--mu);font-size:12px}
+</style></head><body>
+<header><div><h1>🛡️ AI Cybersecurity Early‑Warning Lab</h1><p>Research question: can a model detect previously unseen suspicious patterns while keeping false alarms low?</p></div>
+<div style="display:flex;gap:8px;align-items:center"><span id="live" class="pill">● LIVE</span><button id="pause">Pause</button><button id="theme">Theme</button></div></header>
+<main>
+<section class="card span2"><h2>Network traffic · live radar</h2><canvas id="net"></canvas>
+<div class="lg"><span style="color:var(--ok)">● normal flow</span><span style="color:var(--bad)">● attack packets</span><span style="color:var(--ml)">◯ ML alert</span><span style="color:var(--ru)">◯ rule alert</span></div></section>
+<section class="card"><h2>Alert feed <small>· click to explain</small></h2><div id="feed"></div></section>
+<section class="card"><h2>Anomaly score stream <small>· ● real attack ○ false alarm</small></h2><canvas id="tl"></canvas></section>
+<section class="card"><h2>ROC curve <small id="auc"></small></h2><canvas id="roc"></canvas><div class="lg"><span style="color:var(--ml)">● ML now</span><span style="color:var(--ru)">◆ static rules</span></div></section>
+<section class="card"><h2>Rules vs ML</h2><div id="mt"></div><div id="cm"></div><p id="vd"></p></section>
+<section class="card"><h2>Why was it flagged? <small>· explainable ML</small></h2><div id="ex">Waiting for an alert…</div></section>
+<section class="card"><h2>Detection by attack type</h2><div id="rt"></div></section>
+<section class="card"><h2>Control room</h2>
+<label>ML sensitivity (alert threshold) <b id="tv">1.9</b><input id="th" type="range" min="1.2" max="4" step=".1" value="1.9"></label>
+<label>Attack share, class imbalance <b id="pv">4% · 1 in 25</b><input id="pr" type="range" min="1" max="20" value="4"></label>
+<label><input id="ad" type="checkbox" checked> Adaptive attacker (learns to dodge static rules)</label>
+<div class="btns"><button data-a="scan">Port scan</button><button data-a="ddos">DDoS</button><button data-a="brute">Brute force</button><button data-a="exfil">Exfiltration</button><button data-a="zero" class="hot">⚡ Zero‑day</button><button data-a="storm">🌪 Storm</button></div>
+<h2>Threat index <b id="ti">0</b> <small id="tl2">calm</small></h2><div class="br"><i id="tb"></i></div>
+<h2 style="margin-top:10px">Attacker stealth <b id="st">0%</b></h2><div class="br"><i id="sb" style="background:var(--bad)"></i></div></section>
+</main>
+<footer>Simulated flows, modelled on public intrusion‑detection datasets such as CIC‑IDS2017 and UNSW‑NB15. The model is unsupervised: it learns a baseline of normal traffic and scores deviations. Evaluated on false positives, class imbalance and never‑seen attacks. Benign backups and flash crowds are mixed in as decoys.</footer>
+<script>
+const $=s=>document.querySelector(s),R=Math.random,pick=a=>a[R()*a.length|0];
+const gauss=()=>Math.sqrt(-2*Math.log(1-R()))*Math.cos(6.283185*R());
+const cs=getComputedStyle(document.documentElement),C=n=>cs.getPropertyValue(n).trim();
+const FN=['Packet rate','Bytes per flow','Dest. ports','Duration','SYN ratio'];
+const FU=[v=>v.toFixed(0)+' pkt/s',v=>v>999?(v/1000).toFixed(1)+' kB':v.toFixed(0)+' B',v=>v.toFixed(0),v=>v.toFixed(1)+' s',v=>(v*100).toFixed(0)+'%'];
+const NM=[50,800,2,5,.1];
+const AT={scan:[120,60,40,.5,.9],ddos:[900,300,1,3,.95],brute:[165,200,1,1,.3],exfil:[40,6000,2,30,.1],zero:[62,1500,6,14,.2]};
+const LBL={scan:'Port scan',ddos:'DDoS flood',brute:'Brute force',exfil:'Data exfiltration',zero:'Zero‑day beacon',backup:'Backup job',flash:'Flash crowd',normal:'Normal'};
+const HN=['web‑01','web‑02','db‑01','db‑02','api‑01','api‑02','vpn‑gw','mail‑01','scada‑01','plc‑07'],NH=HN.length;
+let ev=1,mu=[0,0,0,0,0],vr=[1,1,1,1,1],paused=0,pA=.04,thr=1.9,lockT=0,fid=0,P={h:[]},roc=[],op={mf:0,mt:0,rf:0,rt:0},T=0,ti=0;
+const H=[],Q=[],rings=[],pk=[],feed=$('#feed'),adapt=$('#ad');
+function gen(t){
+ if(t=='normal')return[Math.max(5,50+12*gauss()),800*Math.exp(.25*gauss()),1+(R()*3|0),Math.max(.3,5+2*gauss()),Math.min(1,Math.max(0,.1+.05*gauss()))];
+ if(t=='backup')return[60,4500+500*gauss(),2,26+3*gauss(),.1];
+ if(t=='flash')return[480+40*gauss(),500,2,4,.15];
+ const e=t=='zero'?Math.min(1,ev+.3):ev;
+ return AT[t].map((v,i)=>{const m=Math.max(i==4?0:.1,(NM[i]+(v-NM[i])*e)*(1+.1*gauss()));return i==2?Math.max(1,Math.round(m)):i==4?Math.min(1,m):m})}
+const tf=r=>[Math.log(r[0]),Math.log(r[1]),Math.log(r[2]),Math.log(1+r[3]),r[4]];
+(()=>{const s=[];for(let i=0;i<600;i++)s.push(tf(gen('normal')));mu=mu.map((_,j)=>s.reduce((a,x)=>a+x[j],0)/600);vr=mu.map((m,j)=>Math.max(.004,s.reduce((a,x)=>a+(x[j]-m)**2,0)/600))})();
+function sc(x){const z=x.map((v,j)=>(v-mu[j])/Math.sqrt(vr[j]));return{z,s:Math.sqrt(z.reduce((a,b)=>a+b*b,0)/5)}}
+const RULES=[['DDoS rule',r=>r[0]>400],['Port‑scan rule',r=>r[2]>25],['Exfil rule',r=>r[1]>5000&&r[3]>20],['Brute‑force rule',r=>r[0]>140&&r[2]==1&&r[4]>.25&&r[4]<.5]];
+const ruleHit=r=>{for(const[n,f]of RULES)if(f(r))return n;return null};
+function step(quiet){
+ let t,atk=0;
+ if(Q.length){t=Q.shift();atk=1}else if(R()<pA){t=pick(Object.keys(AT));atk=1}else t=R()<.04?pick(['backup','flash']):'normal';
+ const raw=gen(t),x=tf(raw),m=sc(x),rule=ruleHit(raw),tg=R()*NH|0;
+ const f={id:++fid,t,atk,raw,z:m.z,s:m.s,rule,tg,time:new Date()};
+ if(m.s<thr)for(let j=0;j<5;j++){const d=x[j]-mu[j];mu[j]+=.002*d;vr[j]=Math.max(.004,vr[j]+.002*(d*d-vr[j]))}
+ if(!quiet&&atk&&adapt.checked&&t!='zero')ev=rule?Math.max(.35,ev-.05):Math.min(1,ev+.01);
+ H.push(f);if(H.length>1500)H.shift();
+ if(quiet)return;
+ const ml=m.s>thr;spawn(f);
+ if(rule||ml){addAlert(f,ml);if(P.h[tg]){if(ml)rings.push({i:tg,t:0,c:'--ml'});if(rule)rings.push({i:tg,t:-.15,c:'--ru'})}}}
+function spawn(f){const net=f.atk||R()<.6;for(let i=0;i<(f.atk?4:1);i++)if(pk.length<160)pk.push({a:net?-1:R()*NH|0,b:f.tg,t:-i*.08,v:.5+R()*.3,atk:f.atk})}
+function addAlert(f,ml){
+ const d=document.createElement('div');d.className='al';d.style.borderLeftColor=ml?C('--ml'):C('--ru');
+ const az=f.z.map(Math.abs),why=f.rule||'Anomalous '+FN[az.indexOf(Math.max(...az))].toLowerCase();
+ d.innerHTML=`<b>${f.time.toLocaleTimeString([],{hour12:false})}</b><span>${HN[f.tg]}</span><span style="flex:1">${why}</span>${ml?"<span class='chip' style='background:var(--ml)'>ML</span>":''}${f.rule?"<span class='chip' style='background:var(--ru)'>RULE</span>":''}<span class='chip' style='background:${f.atk?'var(--bad)':'var(--mu)'}'>${f.atk?'real threat':'false alarm'}</span>`;
+ d.onclick=()=>{lockT=Date.now();show(f)};feed.prepend(d);while(feed.children.length>40)feed.lastChild.remove();
+ if(f.atk&&ml&&Date.now()-lockT>10000)show(f)}
+function show(f){
+ const sum=f.z.reduce((a,b)=>a+b*b,0),typ=[Math.exp(mu[0]),Math.exp(mu[1]),Math.exp(mu[2]),Math.exp(mu[3])-1,mu[4]];
+ const o=f.z.map((z,i)=>[i,z*z/sum,z]).sort((a,b)=>b[1]-a[1]),tp=o[0];
+ $('#ex').innerHTML=`<p><b>${LBL[f.t]}</b> scored <b>${f.s.toFixed(2)}</b> (alert at ${thr.toFixed(1)}). Main driver: <b>${FN[tp[0]]}</b> is ${Math.abs(tp[2]).toFixed(1)}σ ${tp[2]>0?'above':'below'} the learned baseline.</p>`+
+ o.map(([i,p])=>`<div class="ex"><span>${FN[i]}</span><div class="br"><i data-w="${(p*100).toFixed(0)}" style="background:var(--ml)"></i><em>${FU[i](f.raw[i])} · typical ${FU[i](typ[i])}</em></div></div>`).join('');
+ requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#ex i').forEach(e=>e.style.width=e.dataset.w+'%')))}
+const bar=(id,c)=>`<div class="br"><i id="${id}" style="background:var(${c})"></i><em></em></div>`;
+$('#mt').innerHTML=['Precision','Recall (detection)','F1 score','False‑alarm rate'].map((n,i)=>`<div class="mr"><small>${n}</small>${bar('r'+i,'--ru')}${bar('m'+i,'--ml')}</div>`).join('')+"<div class='lg'><span style='color:var(--ru)'>■ Static rules</span><span style='color:var(--ml)'>■ ML model</span></div>";
+$('#rt').innerHTML=Object.keys(AT).map(k=>`<div class="mr"><small>${LBL[k]}${k=='zero'?' · no rule exists for it':''}</small>${bar('tr'+k,'--ru')}${bar('tm'+k,'--ml')}</div>`).join('');
+function set(id,v,f){const e=$('#'+id);e.style.width=Math.min(100,v*(f?2000:100))+'%';e.nextElementSibling.textContent=(v*100).toFixed(f?1:0)+'%'}
+const pc=v=>Math.round(v*100)+'%';
+function metrics(){
+ const a={r:[0,0,0,0],m:[0,0,0,0]},tc={};for(const k in AT)tc[k]={n:0,r:0,m:0};
+ for(const f of H){const ml=f.s>thr,ru=!!f.rule;
+  for(const[k,p]of[['r',ru],['m',ml]])a[k][f.atk?(p?0:2):(p?1:3)]++;
+  if(f.atk){const q=tc[f.t];q.n++;q.r+=ru;q.m+=ml}}
+ const calc=c=>{const[tp,fp,fn,tn]=c,pr=tp/(tp+fp||1),rc=tp/(tp+fn||1);return[pr,rc,2*pr*rc/(pr+rc||1),fp/(fp+tn||1)]};
+ const r=calc(a.r),m=calc(a.m);
+ for(let i=0;i<4;i++){set('r'+i,r[i],i==3);set('m'+i,m[i],i==3)}
+ for(const k in AT){const q=tc[k];set('tr'+k,q.n?q.r/q.n:0);set('tm'+k,q.n?q.m/q.n:0)}
+ op={mf:m[3],mt:m[1],rf:r[3],rt:r[1]};
+ $('#cm').innerHTML=['r','m'].map(k=>`<span style="color:var(--${k=='r'?'ru':'ml'})">${k=='r'?'Rules':'ML'}: TP ${a[k][0]} · FP ${a[k][1]} · FN ${a[k][2]} · TN ${a[k][3]}</span>`).join('<br>');
+ const z=tc.zero;
+ $('#vd').innerHTML=z.n?`<b>Verdict:</b> on zero‑day beacons the ML model caught <b>${pc(z.m/z.n)}</b> versus <b>${pc(z.r/z.n)}</b> for rules, at <b>${(m[3]*1000).toFixed(0)}</b> false alarms per 1,000 benign flows (rules: ${(r[3]*1000).toFixed(0)}).`:'Inject a zero‑day to see how rules and ML compare on unseen attacks.'}
+function calcRoc(){
+ const P1=H.filter(f=>f.atk).length,N=H.length-P1;if(!P1||!N)return;
+ const a=[...H].sort((x,y)=>y.s-x.s);let tp=0,fp=0,pts=[[0,0]],auc=0;
+ for(const f of a){f.atk?tp++:fp++;const p=[fp/N,tp/P1],q=pts[pts.length-1];auc+=(p[0]-q[0])*(p[1]+q[1])/2;pts.push(p)}
+ roc=pts;$('#auc').textContent='· AUC '+auc.toFixed(3)}
+function fit(c){const r=c.getBoundingClientRect(),d=devicePixelRatio||1,W=Math.round(r.width*d),Hh=Math.round(r.height*d);if(c.width!=W||c.height!=Hh){c.width=W;c.height=Hh}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);return[g,r.width,r.height]}
+function drawNet(dt){
+ const[g,w,h]=fit($('#net'));T+=dt;g.clearRect(0,0,w,h);
+ const hub={x:w*.56,y:h/2},rad=Math.min(w*.3,h*.38),net={x:w*.08,y:h/2};
+ P={hub,net,h:Array.from({length:NH},(_,i)=>{const a=i/NH*6.2832-1.2;return{x:hub.x+rad*Math.cos(a),y:hub.y+rad*Math.sin(a)}})};
+ for(let k=0;k<24;k++){const a=T*.9-k*.04;g.strokeStyle=C('--ok');g.globalAlpha=.14*(1-k/24);g.lineWidth=3;g.beginPath();g.moveTo(hub.x,hub.y);g.lineTo(hub.x+rad*1.25*Math.cos(a),hub.y+rad*1.25*Math.sin(a));g.stroke()}
+ g.globalAlpha=1;g.lineWidth=1;[.55,1.1].forEach(k=>{g.beginPath();g.arc(hub.x,hub.y,rad*k,0,7);g.strokeStyle=C('--bd');g.stroke()});
+ g.setLineDash([4,6]);g.lineDashOffset=-T*30;g.strokeStyle=C('--mu');g.globalAlpha=.45;
+ P.h.concat([net]).forEach(n=>{g.beginPath();g.moveTo(hub.x,hub.y);g.lineTo(n.x,n.y);g.stroke()});g.setLineDash([]);g.globalAlpha=1;
+ const nd=(p,r,c,l)=>{g.beginPath();g.arc(p.x,p.y,r,0,7);g.fillStyle=C('--card');g.fill();g.lineWidth=2;g.strokeStyle=c;g.stroke();g.fillStyle=C('--mu');g.font='10px system-ui';g.textAlign='center';g.fillText(l,p.x,p.y+r+12)};
+ g.globalAlpha=.3;g.beginPath();g.arc(hub.x,hub.y,17+3*Math.sin(T*3),0,7);g.strokeStyle=C('--ok');g.stroke();g.globalAlpha=1;
+ nd(hub,13,C('--ok'),'core switch');nd(net,16,C('--bad'),'Internet');P.h.forEach((p,i)=>nd(p,9,C('--ok'),HN[i]));
+ for(let i=rings.length;i--;){const r=rings[i];r.t+=dt;if(r.t>1){rings.splice(i,1);continue}if(r.t<0)continue;const p=P.h[r.i];g.beginPath();g.arc(p.x,p.y,10+r.t*36,0,7);g.strokeStyle=C(r.c);g.globalAlpha=1-r.t;g.lineWidth=3;g.stroke()}
+ g.globalAlpha=1;
+ for(let i=pk.length;i--;){const p=pk[i];p.t+=dt*p.v;if(p.t>=1){pk.splice(i,1);continue}if(p.t<0)continue;
+  const A=p.a<0?net:P.h[p.a],B=P.h[p.b],u=p.t<.5?p.t*2:p.t*2-1,s=p.t<.5?[A,hub]:[hub,B];
+  g.beginPath();g.arc(s[0].x+(s[1].x-s[0].x)*u,s[0].y+(s[1].y-s[0].y)*u,p.atk?4:2.5,0,7);g.fillStyle=C(p.atk?'--bad':'--ok');g.shadowColor=g.fillStyle;g.shadowBlur=p.atk?14:6;g.fill()}
+ g.shadowBlur=0;if(T<2){g.globalAlpha=1-T/2;g.fillStyle=C('--ok');g.font='13px system-ui';g.textAlign='left';g.fillText('Calibrating baseline of normal traffic…',12,22);g.globalAlpha=1}}
+function drawTL(){
+ const[g,w,h]=fit($('#tl')),d=H.slice(-120),n=120,Y=s=>h-8-(Math.min(s,8)/8)*(h-20),X=i=>10+(i+n-d.length)*(w-20)/(n-1);
+ g.clearRect(0,0,w,h);g.strokeStyle=C('--bd');g.lineWidth=1;[0,2,4,6,8].forEach(v=>{g.beginPath();g.moveTo(0,Y(v));g.lineTo(w,Y(v));g.stroke()});
+ g.beginPath();d.forEach((f,i)=>i?g.lineTo(X(i),Y(f.s)):g.moveTo(X(i),Y(f.s)));g.strokeStyle=C('--ok');g.lineWidth=1.8;g.stroke();
+ g.lineTo(X(d.length-1),h);g.lineTo(X(0),h);g.fillStyle=C('--ok');g.globalAlpha=.12;g.fill();g.globalAlpha=1;
+ g.setLineDash([6,4]);g.strokeStyle=C('--ml');g.lineWidth=1.5;g.beginPath();g.moveTo(0,Y(thr));g.lineTo(w,Y(thr));g.stroke();g.setLineDash([]);
+ g.fillStyle=C('--ml');g.font='11px system-ui';g.textAlign='left';g.fillText('alert threshold',6,Y(thr)-4);
+ d.forEach((f,i)=>{if(f.atk||f.s>thr){g.beginPath();g.arc(X(i),Y(f.s),4,0,7);if(f.atk){g.fillStyle=C('--bad');g.fill()}else{g.strokeStyle=C('--ru');g.lineWidth=2;g.stroke()}}})}
+function drawROC(){
+ const[g,w,h]=fit($('#roc')),L=34,B=24,W=w-L-10,Hh=h-B-8,X=v=>L+Math.sqrt(v)*W,Y=v=>8+(1-v)*Hh;
+ g.clearRect(0,0,w,h);g.strokeStyle=C('--bd');g.lineWidth=1;g.strokeRect(L,8,W,Hh);
+ g.setLineDash([4,4]);g.beginPath();g.moveTo(X(0),Y(0));g.lineTo(X(1),Y(1));g.stroke();g.setLineDash([]);
+ if(roc.length){g.beginPath();roc.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])));g.strokeStyle=C('--ml');g.lineWidth=2.5;g.stroke();g.lineTo(X(1),Y(0));g.lineTo(X(0),Y(0));g.fillStyle=C('--ml');g.globalAlpha=.12;g.fill();g.globalAlpha=1}
+ const pu=4+2*Math.sin(performance.now()/200);
+ g.beginPath();g.arc(X(op.mf),Y(op.mt),pu+2,0,7);g.fillStyle=C('--ml');g.fill();
+ const x=X(op.rf),y=Y(op.rt);g.beginPath();g.moveTo(x,y-7);g.lineTo(x+7,y);g.lineTo(x,y+7);g.lineTo(x-7,y);g.closePath();g.fillStyle=C('--ru');g.fill();
+ g.fillStyle=C('--mu');g.font='11px system-ui';g.fillText('detect ↑',2,16);g.fillText('false alarms → (√ scale)',w-132,h-6)}
+function gauges(){
+ const fr=H.slice(-25).filter(f=>f.s>thr).length/25;ti+=(Math.min(100,fr*300)-ti)*.06;
+ $('#ti').textContent=ti.toFixed(0);$('#tl2').textContent=ti<25?'· calm':ti<60?'· elevated':'· CRITICAL';
+ const b=$('#tb');b.style.width=ti+'%';b.style.background=`hsl(${120-1.2*ti},80%,50%)`;
+ const s=(1-ev)/.65*100;$('#st').textContent=s.toFixed(0)+'%';$('#sb').style.width=s+'%'}
+$('#th').oninput=e=>{thr=+e.target.value;$('#tv').textContent=thr.toFixed(1);metrics()};
+$('#pr').oninput=e=>{pA=e.target.value/100;$('#pv').textContent=e.target.value+'% · 1 in '+Math.round(100/e.target.value)};
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='storm')for(let i=0;i<30;i++)Q.push(pick(Object.keys(AT)));else for(let i=0;i<8;i++)Q.push(a)});
+$('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Resume':'Pause';$('#live').textContent=paused?'❚❚ PAUSED':'● LIVE'};
+let dark=matchMedia('(prefers-color-scheme: dark)').matches;
+$('#theme').onclick=()=>{dark=!dark;document.documentElement.dataset.theme=dark?'dark':'light'};
+document.querySelectorAll('.card').forEach((c,i)=>c.style.animationDelay=i*.08+'s');
+for(let i=0;i<400;i++)step(1);
+metrics();calcRoc();
+{const f=[...H].reverse().find(f=>f.atk&&f.s>thr);if(f)show(f)}
+setInterval(()=>{if(!paused){metrics();calcRoc()}},700);
+let last=0,acc=0;
+function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;const d=paused?0:dt;acc+=d;while(acc>.14){acc-=.14;step()}drawNet(d);drawTL();drawROC();gauges();requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
